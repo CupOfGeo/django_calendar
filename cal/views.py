@@ -25,8 +25,8 @@ def index(request):
     week = ([("".join(calendar.split('\n')[:x[0]+1])) for x in enumerate(calendar.split('\n')) if '>'+str(datetime.date.today().day)+'<' in x[1]][0])
     week=week+' </table>'
 
-    #textarea = ' <textarea maxlength="1000"></textarea> '
-    textbox = ' <div contenteditable="true" role="textbox" spellcheck="true" style="outline: none; white-space: pre-wrap; overflow-wrap: break-word;"></div> '
+    textbox = ' <textarea maxlength="1000"></textarea> '
+    #textbox = ' <div contenteditable="true" role="textbox" spellcheck="true" style="outline: none; white-space: pre-wrap; overflow-wrap: break-word;"></div> '
     week = week.replace('</td>', textbox+' </td> ')
     #= render_to_response(request, 'index.html', {"time" : time}, context_instance = RequestContext(request))
     #response.set_cookie('time', datetime.datetime.now())
@@ -45,7 +45,7 @@ def index(request):
 
     if request.method == 'POST':
         print(request.POST['title'])
-        #print(form.title)
+
     context['form'] = mark_safe(form)
 
     response = render(request, 'cal/index.html', context)
