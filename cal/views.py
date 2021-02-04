@@ -3,20 +3,55 @@ import datetime
 from calendar import HTMLCalendar
 from django.utils.safestring import mark_safe
 
+from django.template import RequestContext #cookies stuff
+
+from .calform import CalForm
+
 # Create your views here.
 def index(request):
     #latest_question_list = Question.objects.order_by('-pub_date')[:5]
     #context = {'latest_question_list': latest_question_list}
+
+
     context = {}
     cal = HTMLCalendar()
+
     calendar = cal.formatmonth(datetime.date.today().year, datetime.date.today().month, withyear=True)
-    calendar = calendar.replace('<td ', '<td  width="150" height="125"')
-    calendar = calendar.replace('<table border="0" cellpadding="0" cellspacing="0" class="month">', '<table class="month">')
-    print(calendar)
+    #print(calendar)
+    print('v'*50)
+    calendar = calendar.replace('<td ', '<td  width="150" height="125" style="text-align:left;vertical-align:top;padding:0" ')
+    calendar = calendar.replace('<table border="0" cellpadding="0" cellspacing="0" class="month">', '<table border="1" class="month">')
+    #print(calendar)
+    week = ([("".join(calendar.split('\n')[:x[0]+1])) for x in enumerate(calendar.split('\n')) if '>'+str(datetime.date.today().day)+'<' in x[1]][0])
+    week=week+' </table>'
 
-    context['calendar'] = mark_safe(calendar)
+    #textarea = ' <textarea maxlength="1000"></textarea> '
+    textbox = ' <div contenteditable="true" role="textbox" spellcheck="true" style="outline: none; white-space: pre-wrap; overflow-wrap: break-word;"></div> '
+    week = week.replace('</td>', textbox+' </td> ')
+    #= render_to_response(request, 'index.html', {"time" : time}, context_instance = RequestContext(request))
+    #response.set_cookie('time', datetime.datetime.now())
 
-    return render(request, 'cal/index.html', context)
+    if 'time' in request.COOKIES:
+        last_time = request.COOKIES['time']
+    else:
+        last_time = 'no cookie'
+    print(last_time)
+
+
+
+    context['calendar'] = mark_safe(week)#calendar)
+
+    form = CalForm(request.POST or None)
+
+    if request.method == 'POST':
+        print(request.POST['title'])
+        #print(form.title)
+    context['form'] = mark_safe(form)
+
+    response = render(request, 'cal/index.html', context)
+    #responce = render_to_response(request, 'cal/index.html', context)
+    response.set_cookie('time', datetime.datetime.now())
+    return response
 
 
 # <table class="month">

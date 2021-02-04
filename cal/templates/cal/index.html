@@ -1,1 +1,12 @@
 {{ calendar }}
+
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+</form>
+
+<div class="public-DraftEditor-content" contenteditable="true" role="textbox" spellcheck="true" style="outline: none; white-space: pre-wrap; overflow-wrap: break-word;">
+<div><h1><span data-text="true">Heyo</span></h1></div>
+<div><h2><span data-text="true">Dear Future George</span></h2></div>
+</div>
