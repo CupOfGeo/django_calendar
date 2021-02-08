@@ -1,6 +1,7 @@
 <html>
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
 </head>
 
@@ -28,6 +29,7 @@ div{padding:1px; background-color:#323232; color:#ffffff; font-family:Menlo, Con
 .top{width:136px; height:45px;}
 .time{width:136px; height:15px;}
 .saw{width:274px;padding:1px;}
+
 
 body{background-color:#323232;}
 </style>
@@ -331,11 +333,13 @@ body{background-color:#323232;}
 
 
 function setAllText() {
+
   var text_areas = document.querySelectorAll('.save');
   var count = 0;
   text_areas.forEach((t) => {
-    t.innerHTML = document.cookie.split('; ').find(row => row.startsWith(String(count)))
-  .split('=')[1];
+    t.innerHTML = Cookies.get(count)
+    //document.cookie.split('; ').find(row => row.startsWith(String(count))).split('=')[1];
+
     count += 1;
   });
 
@@ -344,19 +348,106 @@ function setAllText() {
 
 document.addEventListener("DOMContentLoaded", function() {
   setAllText();
-  document.getElementById('some-id').addEventListener('paste', handlePaste);
+  //document.getElementById('some-id').addEventListener('paste', handlePaste);
 });
 
 
 function getAllText() {
+
   var count = 0;
   var text_areas = document.querySelectorAll('.save');
   var divs = document.querySelectorAll('.di');
   //console.log(divs[0].innerHTML)
 
-  text_areas.forEach((t) => {
-    document.cookie = String(count)+'='+String(t.innerHTML);
+  text_areas.forEach((t) => { //parse out if last char is a space
+    Cookies.set(count, t.innerHTML);
+    // if (t.innerHTML.indexOf('&nbsp;') !== -1){
+    //   document.cookie = String(count)+'='+ t.innerHTML.slice(0,t.innerHTML.indexOf('&nbsp;'));
+    // } else {
+    //   document.cookie = String(count)+'='+t.innerHTML;
+    // }
     count += 1;
+
+    // if (t.innerHTML.indexOf('span') !== -1) {
+    //   //e.stopPropagation();
+    //   console.log(t.innerHTML)
+    //   var h = document.getElementsByTagName('span')[0];
+    //   console.log(h.innerHTML)
+    //   var d = document.createElement('div');
+    //   d.innerHTML = h.innerHTML;
+    //   h.parentNode.replaceChild(d, h);
+
+//TODO THIS RIGHT HERE NEED TO REMOVE ALL TAGS IF I PASTE OR WHAT NOT
+//IF IN THE DIV HERE ARE MORE TAGS GET RID OF THEM
+      if (t.innerHTML.indexOf('<') !== -1) {
+        var allTags = t.getElementsByTagName("*");
+        var joined = ''//t.innerHTML
+          for (var i = 0, len = allTags.length; i < len; i++) {
+            if (allTags[i].hasAttribute("style")) {
+               //console.log(allTags[i].hasAttribute("style"))
+              allTags[i].removeAttribute('style')
+              //allTags[i].setAttribute = {}
+              //console.log('attr',allTags[i].attributes)
+             }
+            if (allTags[i].hasAttribute("id")) {
+               allTags[i].removeAttribute('id')
+              }
+            if (allTags[i].hasAttribute("class")) {
+                allTags[i].removeAttribute('class')
+               }
+
+
+
+            //console.log(i, allTags[i].innerHTML)
+            //console.log('no', allTags[i].nodeName)
+            if (allTags[i].nodeName !== 'DIV' || allTags[i].nodeName !== 'BR') {
+            //  console.log('not div or br', allTags[i].innerHTML)
+            }
+            if (allTags[i].nodeName === 'SPAN') {
+              //console.log(i,allTags[i])
+              //console.log(allTags[i].innerHTML)
+            }
+            //   joined = joined + allTags[i].innerHTML.replace('<br>','')
+            // }
+            // else{
+            //   if (i === 0){
+            //     joined =  joined + allTags[i].innerHTML
+            //   } else {
+            //     joined =  joined + '<br>' + allTags[i].innerHTML
+            //   }
+            //
+            // }
+
+
+
+            //allTags[i].parentNode.removeChild(allTags[i]);
+            // if (allTags[i].innerHTML.indexOf('<div>') !== -1) { //there is a div tag inside
+            //   console.log('hi',allTags)
+            //
+            // }
+            // if (allTags[i] === '<br>') { //makes one of these for no reason so remove it
+            //   t.innerHTML.replace('<br>','')
+            // }
+              // allTags[i] is an element within the container object
+              // allTags[i].id is the id of the element (if there is one)
+
+          }
+
+          //console.log(joined)
+
+          //t.innerHTML = joined
+          //console.log(t.innerHTML)
+
+        //var h = document.getElementsByTagName('h1')[0];
+        //var d = document.createElement('div');
+        //console.log(h.innerHTML)
+        //d.innerHTML = h.innerHTML;
+        //h.parentNode.replaceChild(d, h);
+
+      }
+    //}
+
+
   });
   //document.cookie = 'di='+divs[0].innerHTML
 
@@ -372,22 +463,41 @@ function getAllText() {
 //     }
 // });
 
+document.addEventListener('paste', function (evt) {
+  let paste = (event.clipboardData || window.clipboardData).getData('text');
+  paste
 
-function handlePaste (e) {
-    var clipboardData, pastedData;
+  const selection = window.getSelection();
+  if (!selection.rangeCount) return false;
+  selection.deleteFromDocument();
+  selection.getRangeAt(0).insertNode(document.createTextNode(paste));
 
-    // Stop data actually being pasted into div
-    e.stopPropagation();
-    e.preventDefault();
+  event.preventDefault();
+});
 
-    // Get pasted data via clipboard API
-    clipboardData = e.clipboardData || window.clipboardData;
-    pastedData = clipboardData.getData('Text');
 
-    // Do whatever with pasteddata
-    console.log(pastedData);
+// const target = document.querySelector('div.target');
+//
+// target.addEventListener('paste', (event) => {
+//     let paste = (event.clipboardData || window.clipboardData).getData('text');
+//     paste = paste.toUpperCase();
+//
+//     const selection = window.getSelection();
+//     if (!selection.rangeCount) return false;
+//     selection.deleteFromDocument();
+//     selection.getRangeAt(0).insertNode(document.createTextNode(paste));
+//
+//     event.preventDefault();
+// });
+
+
+
+
+window.onbeforeunload = confirmExit;
+function confirmExit()
+{
+  getAllText()
+  //return "You have attempted to leave this page.  If you have made any changes to the fields without clicking the Save button, your changes will be lost.  Are you sure you want to exit this page?";
 }
-
-
 
 </script>
