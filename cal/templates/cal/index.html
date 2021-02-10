@@ -353,7 +353,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 function getAllText() {
-
   var count = 0;
   var text_areas = document.querySelectorAll('.save');
   var divs = document.querySelectorAll('.di');
@@ -361,21 +360,8 @@ function getAllText() {
 
   text_areas.forEach((t) => { //parse out if last char is a space
     Cookies.set(count, t.innerHTML);
-    // if (t.innerHTML.indexOf('&nbsp;') !== -1){
-    //   document.cookie = String(count)+'='+ t.innerHTML.slice(0,t.innerHTML.indexOf('&nbsp;'));
-    // } else {
-    //   document.cookie = String(count)+'='+t.innerHTML;
-    // }
-    count += 1;
 
-    // if (t.innerHTML.indexOf('span') !== -1) {
-    //   //e.stopPropagation();
-    //   console.log(t.innerHTML)
-    //   var h = document.getElementsByTagName('span')[0];
-    //   console.log(h.innerHTML)
-    //   var d = document.createElement('div');
-    //   d.innerHTML = h.innerHTML;
-    //   h.parentNode.replaceChild(d, h);
+    count += 1;
 
 //TODO THIS RIGHT HERE NEED TO REMOVE ALL TAGS IF I PASTE OR WHAT NOT
 //IF IN THE DIV HERE ARE MORE TAGS GET RID OF THEM
@@ -400,57 +386,62 @@ function getAllText() {
 
             //console.log(i, allTags[i].innerHTML)
             //console.log('no', allTags[i].nodeName)
-            if (allTags[i].nodeName !== 'DIV' || allTags[i].nodeName !== 'BR') {
-            //  console.log('not div or br', allTags[i].innerHTML)
-            }
-            if (allTags[i].nodeName === 'SPAN') {
-              //console.log(i,allTags[i])
-              //console.log(allTags[i].innerHTML)
-            }
-            //   joined = joined + allTags[i].innerHTML.replace('<br>','')
-            // }
-            // else{
-            //   if (i === 0){
-            //     joined =  joined + allTags[i].innerHTML
-            //   } else {
-            //     joined =  joined + '<br>' + allTags[i].innerHTML
-            //   }
-            //
-            // }
+            //|| allTags[i].nodeName !== 'BR')
+            if (String(allTags[i].nodeName) === 'DIV') {
+              //console.log(allTags[i])
+              //console.log(allTags[i].outterHTML)
+              if (allTags[i].innerHTML.indexOf('#') === 0) {
+                console.log(allTags[i].attributes)
+                var h1 = document.createElement('H1')
+                h1.innerHTML = allTags[i].innerHTML;
+                allTags[i].blur();
+                allTags[i].parentNode.replaceChild(h1, allTags[i]);
+
+
+                //allTags[i].parentNode.insertBefore(document.createElement('H1'), allTags[i]);
+                //allTags[i].parentNode.removeChild(allTags[i]);
+                //v
+                //h1.innerHTML = allTags[i].innerHTML;
+                //allTags[i].innerHTML = ''
+                //allTags[i].appendChild(h1);
+              }
+
+            //  console.log(allTags[i].innerHTML.indexOf('---'))
+
+              if (allTags[i].innerHTML.indexOf('---') !== -1 && allTags[i].innerHTML.indexOf('---') == allTags[i].innerHTML.length-3){
+                //console.log(allTags[i].style)
+                allTags[i].style.setProperty("text-decoration", "line-through");
+              }
+
+              if (allTags[i].innerHTML.indexOf('allclickmes') !== -1) {
+                allTags[i].innerHTML = allTags[i].innerHTML.replace('clickme','')
+                console.log(allTags[i].innerHTML)
+                //remove clickme from string and replace with input
+                allTags[i].innerHTML = allTags[i].innerHTML + '<input type="button"><input type="checkbox"><input type="color"><input type="date"><input type="datetime-local"><input type="email"><input type="file"><input type="hidden"><input type="image"><input type="month"><input type="number"><input type="password"><input type="radio"><input type="range"><input type="reset"><input type="search"><input type="submit"><input type="tel"><input type="text"><input type="time"><input type="url"><input type="week">'
+              }
+
+
+              // var inps = '<input type="button">/<input type="checkbox">/<input type="color">/<input type="date">/<input type="datetime-local">/<input type="email">/<input type="file">/<input type="hidden">/<input type="image">/<input type="month">/<input type="number">/<input type="password">/<input type="radio">/<input type="range">/<input type="reset">/<input type="search">/<input type="submit">/<input type="tel">/<input type="text">/<input type="time">/<input type="url">/<input type="week">'.split('/')
+              // for (var i = 0; i < inps.length; i++) {
+              //
+              //   if (allTags[i].innerHTML.indexOf('clickme' + inps[i]) !== -1) {
+              //     allTags[i].innerHTML = allTags[i].innerHTML + '<input type="' + inps[i] + '">'
+              //     allTags[i].innerHTML = allTags[i].innerHTML.replace('clickme' + inps[i],'')
+              //     console.log(allTags[i].innerHTML + '<input type="' + inps[i] + '">')
+              //     //remove clickme from string and replace with input
+              //
+              //   }
+              // }
 
 
 
-            //allTags[i].parentNode.removeChild(allTags[i]);
-            // if (allTags[i].innerHTML.indexOf('<div>') !== -1) { //there is a div tag inside
-            //   console.log('hi',allTags)
-            //
-            // }
-            // if (allTags[i] === '<br>') { //makes one of these for no reason so remove it
-            //   t.innerHTML.replace('<br>','')
-            // }
-              // allTags[i] is an element within the container object
-              // allTags[i].id is the id of the element (if there is one)
 
           }
-
-          //console.log(joined)
-
-          //t.innerHTML = joined
-          //console.log(t.innerHTML)
-
-        //var h = document.getElementsByTagName('h1')[0];
-        //var d = document.createElement('div');
-        //console.log(h.innerHTML)
-        //d.innerHTML = h.innerHTML;
-        //h.parentNode.replaceChild(d, h);
-
       }
-    //}
+  }
 
 
-  });
-  //document.cookie = 'di='+divs[0].innerHTML
-
+});
 }
 
 // $('div[contenteditable]').keydown(function(e) {
@@ -465,7 +456,7 @@ function getAllText() {
 
 document.addEventListener('paste', function (evt) {
   let paste = (event.clipboardData || window.clipboardData).getData('text');
-  paste
+  console.log(paste)
 
   const selection = window.getSelection();
   if (!selection.rangeCount) return false;
